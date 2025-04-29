@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecological Challenge</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <div class="header">ECOLOGICAL CHALLENGE</div>
+        <div class="nav">
+            <button :class="{ active: currentPage === 'about' }" @click="currentPage = 'about'">À propos</button>
+            <button :class="{ active: currentPage === 'home' }" @click="currentPage = 'home'">Accueil</button>
+            <button :class="{ active: currentPage === 'challenges' }" @click="currentPage = 'challenges'">Défis</button>
+            <button v-if="!isLoggedIn" :class="{ active: currentPage === 'login' }" @click="currentPage = 'login'">Connexion</button>
+            <button v-else @click="logout">Déconnexion</button>
+        </div>
+
+        <div class="content">
+            <!-- Page À propos -->
+            <div v-if="currentPage === 'about'" class="about-page">
+                <h2>Nos mesures écologiques</h2>
+                <p>
+                    Bienvenue sur <strong>Ecological Challenge</strong>, une plateforme dédiée à la sensibilisation et à l’action pour un avenir plus durable !
+                </p>
+                <h3>Pourquoi participer ?</h3>
+                <ul>
+                    <li><strong>Réduire votre empreinte carbone :</strong> Adoptez des habitudes respectueuses de l’environnement.</li>
+                    <li><strong>Mesurer votre impact :</strong> Suivez vos progrès grâce à notre indicateur de CO₂ économisé.</li>
+                    <li><strong>Agir collectivement :</strong> Rejoignez notre communauté pour un impact global.</li>
+                </ul>
+                <h3>Nos engagements :</h3>
+                <p>
+                    Nous nous engageons à fournir des défis concrets et mesurables pour aider chacun à réduire son empreinte écologique. Ensemble, nous pouvons faire une différence !
+                </p>
+                <button class="join-button" @click="currentPage = 'login'">Rejoignez-nous dès maintenant !</button>
+            </div>
+
+            
+        <div class="content">
+            <div v-if="currentPage === 'home'">
+                <div class="welcome">Relevez des défis écologiques et gagnez des points !</div>
+                <div class="progress-circle" :style="{ '--fill-percentage': co2FillPercentage + '%' }"></div>
+                <p>{{ totalCo2Saved }} kg CO₂ économisés</p>
+                <p v-if="isLoggedIn">Points: {{ userPoints }}</p>
+                <p v-else>Connectez-vous pour voir vos points</p>
+            </div>
+            <div v-if="currentPage === 'challenges'" class="challenges">
+                <div v-if="displayedChallenges.length === 0" class="no-challenges">
+                    Tous les défis sont complétés !
+                    <button class="reset-button" @click="resetChallenges">Recommencer</button>
+                </div>
+                <div v-else v-for="challenge in displayedChallenges" :key="challenge.id" :class="{ 'challenge-card': true, 'completed': isChallengeCompleted(challenge.id) }">
+                    <div class="star">★</div>
+                    <p>{{ challenge.points }} Points</p>
+                    <p>{{ challenge.description }}</p>
+                    <button v-if="isLoggedIn && !isChallengeCompleted(challenge.id)" @click="completeChallenge(challenge.id, challenge.points, challenge.co2_saved)">Valider</button>
+                    <button v-else disabled>Déjà validé</button>
+                </div>
+            </div>
+            <div v-if="currentPage === 'login'" class="login-box">
+                <p>Entrez votre pseudo</p>
+                <input type="text" v-model="username" placeholder="Pseudo">
+                <p>Entrez votre email</p>
+                <input type="email" v-model="email" placeholder="Email">
+                <p>Entrez votre mot de passe</p>
+                <input type="password" v-model="password" placeholder="Mot de passe">
+                <button @click="isLoginMode ? login() : register()">{{ isLoginMode ? 'Se connecter' : 'S\'inscrire' }}</button>
+                <p class="toggle-mode" @click="isLoginMode = !isLoginMode">
+                    {{ isLoginMode ? 'Pas de compte ? Inscrivez-vous' : 'Déjà un compte ? Connectez-vous' }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
